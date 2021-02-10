@@ -53,7 +53,23 @@ def get_crypto_value(api_url, api_key_crypto):
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         return e
 
+def save_crypto_to_json(api_url, api_key_crypto):
+    with open('crypto_data.json', 'w') as file:
+        json.dump(get_crypto_value(api_url, api_key_crypto), file)
+        file.close()
+
+
+def get_crypto_price(crypto_name, api_url_base_crypto, api_key_crypto):
+
+    save_crypto_to_json(api_url_base_crypto, api_key_crypto)
+
+    with open('crypto_data.json', 'r') as file:
+        data = json.load(file)
+        return data['data'][0]['quote']['USD']['price']
 
 
 #print(get_rate())
-print(get_crypto_value(api_url_base_crypto, api_key_crypto))
+#get_crypto_value(api_url_base_crypto, api_key_crypto)
+
+#save_crypto_to_json(api_url_base_crypto, api_key_crypto)
+print(get_crypto_price("BTC", api_url_base_crypto, api_key_crypto))
