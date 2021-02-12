@@ -10,7 +10,8 @@ target_currency = 'PLN'
 
 
 api_key_crypto = 'b247350e-d4f6-4bb1-8860-c6d7365311af'
-api_url_base_crypto = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+#api_url_base_crypto = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest'
+api_url_base_crypto = 'https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest'
 
 def get_info():
     response = requests.get(api_url_base + '?access_key=' + api_key)
@@ -30,12 +31,11 @@ def get_rate():
 
     return (pln/usd)
 
-def get_crypto_values(api_url, api_key_crypto):
+def get_crypto_info(api_url, api_key_crypto, crypto_name):
     
     parameters = {
-        'start':'1',
-        'limit':'5000',
-        'convert':'USD'
+        'convert':'USD',
+        'symbol': crypto_name
     }
     
     headers = {
@@ -53,26 +53,24 @@ def get_crypto_values(api_url, api_key_crypto):
     except (ConnectionError, Timeout, TooManyRedirects) as e:
         return e
 
-def save_crypto_to_json(api_url, api_key_crypto):
+def save_crypto_to_json(api_url, api_key_crypto, crypto_name):
     with open('crypto_data.json', 'w') as file:
-        json.dump(get_crypto_values(api_url, api_key_crypto), file)
+        json.dump(get_crypto_info(api_url, api_key_crypto, crypto_name), file)
         file.close()
 
 
 def get_crypto_price(crypto_name, api_url_base_crypto, api_key_crypto):
 
-    save_crypto_to_json(api_url_base_crypto, api_key_crypto)
+    save_crypto_to_json(api_url_base_crypto, api_key_crypto, crypto_name)
 
     with open('crypto_data.json', 'r') as file:
         data = json.load(file)
-        i = 0
 
-        while data['data'][i]['symbol'] != crypto_name:
-            i+=1
-
-        return data['data'][i]['quote']['USD']['price']
+        price = data['data'][crypto_name]['quote']['USD']['price']
+        file.close()
+    return price
 
 
 
 
-print(get_crypto_price("BTC", api_url_base_crypto, api_key_crypto))
+#print(get_crypto_price("BTC", api_url_base_crypto, api_key_crypto))
